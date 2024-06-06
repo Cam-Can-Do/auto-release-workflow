@@ -85,41 +85,26 @@ jobs:
         if: runner.os == 'Windows'
         run: powershell Compress-Archive -Path ${{ steps.strings.outputs.build-output-dir }}-temp\* -DestinationPath ${{ steps.strings.outputs.binary-name }}.zip
 
-      - name: Get current date
-        id: date
-        run: echo "DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.DATE }}
-          release_name: Release ${{ env.DATE }}
-          draft: false
-          prerelease: false
-
       - name: Upload Release Asset for Linux
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.c_compiler == 'gcc'
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ steps.strings.outputs.binary-name }}.tar.gz
           asset_name: ${{ steps.strings.outputs.binary-name }}.tar.gz
           asset_content_type: application/gzip
 
       - name: Upload Release Asset for Windows
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.c_compiler == 'gcc'
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ steps.strings.outputs.binary-name }}.zip
           asset_name: ${{ steps.strings.outputs.binary-name }}.zip
           asset_content_type: application/zip
