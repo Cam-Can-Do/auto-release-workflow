@@ -78,7 +78,7 @@ jobs:
         fi
     - name: List built files
       run: 
-        - tree ${{ steps.strings.outputs.build-output-dir }}
+        tree ${{ steps.strings.outputs.build-output-dir }}
     
     #- name: Test
     #  working-directory: ${{ steps.strings.outputs.build-output-dir }}
