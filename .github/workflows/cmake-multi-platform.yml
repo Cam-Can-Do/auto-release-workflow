@@ -3,10 +3,12 @@ name: CMake on multiple platforms
 on:
   push:
     branches:
-      - main # Replace with your default branch if it's not 'main'
+      - main 
   pull_request:
     branches:
-      - main # Replace with your default branch if it's not 'main'
+      - main 
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -61,19 +63,29 @@ jobs:
         working-directory: ${{ steps.strings.outputs.build-output-dir }}
         run: ctest --build-config ${{ matrix.build_type }}
 
+      - name: Copy build directory to temp for Linux
+        if: runner.os == 'Linux'
+        run: rsync -a ${{ steps.strings.outputs.build-output-dir }}/ ${{ steps.strings.outputs.build-output-dir }}-temp/
+
       - name: Archive build for Linux
         if: runner.os == 'Linux'
-        run: tar -czvf ${{ steps.strings.outputs.build-output-dir }}/binary.tar.gz -C ${{ steps.strings.outputs.build-output-dir }} .
+        run: tar -czvf ${{ steps.strings.outputs.build-output-dir }}-temp/binary.tar.gz -C ${{ steps.strings.outputs.build-output-dir }}-temp .
+
+      - name: Copy build directory to temp for Windows
+        if: runner.os == 'Windows'
+        run: |
+          powershell New-Item -ItemType Directory -Force -Path ${{ steps.strings.outputs.build-output-dir }}-temp
+          powershell Copy-Item -Recurse -Force ${{ steps.strings.outputs.build-output-dir }}\* ${{ steps.strings.outputs.build-output-dir }}-temp
 
       - name: Archive build for Windows
         if: runner.os == 'Windows'
-        run: powershell Compress-Archive -Path ${{ steps.strings.outputs.build-output-dir }}\* -DestinationPath ${{ steps.strings.outputs.build-output-dir }}\binary.zip
+        run: powershell Compress-Archive -Path ${{ steps.strings.outputs.build-output-dir }}-temp\* -DestinationPath ${{ steps.strings.outputs.build-output-dir }}\binary.zip
 
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # or use a PAT if necessary
         with:
           tag_name: $(date +%Y-%m-%d)
           release_name: Release $(date +%Y-%m-%d)
@@ -85,10 +97,10 @@ jobs:
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # or use a PAT if necessary
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.strings.outputs.build-output-dir }}/binary.tar.gz
+          asset_path: ${{ steps.strings.outputs.build-output-dir }}-temp/binary.tar.gz
           asset_name: ${{ steps.strings.outputs.binary-name }}.tar.gz
           asset_content_type: application/gzip
 
@@ -97,7 +109,7 @@ jobs:
         id: upload-release-asset-windows
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # or use a PAT if necessary
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.strings.outputs.build-output-dir }}\binary.zip
