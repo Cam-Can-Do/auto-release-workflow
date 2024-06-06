@@ -65,9 +65,21 @@ jobs:
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run:
-        cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
-        tree ./
+        cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }};
 
+    - name: Install tree
+      run: |
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          sudo apt-get install -y tree
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          brew install tree
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          choco install tree
+        fi
+    - name: List built files
+      run: 
+        - tree ${{ steps.strings.outputs.build-output-dir }}
+    
     #- name: Test
     #  working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
