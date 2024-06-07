@@ -129,7 +129,7 @@ jobs:
           shasum -a 256 main-macos.tar.gz >> hash.txt
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           echo ${{ runner.os }} >> hash.txt
-          powershell "(Get-FileHash -Path main-windows.zip -Algorithm SHA256).Hash" | Out-File -Append hash.txt
+          powershell -Command "(Get-FileHash -Path main-windows.zip -Algorithm SHA256).Hash | Out-File -Append -Encoding string hash.txt"
         fi
     
     - name: List artefacts and build files
