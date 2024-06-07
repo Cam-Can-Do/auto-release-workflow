@@ -92,7 +92,7 @@ jobs:
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
           mv main artefacts/main-macos
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          mv Release\main.exe artefacts\main-windows.exe
+          mv Release/main.exe artefacts/main-windows.exe
         fi
 
     - name: List built files
