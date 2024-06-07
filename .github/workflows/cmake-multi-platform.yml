@@ -131,8 +131,33 @@ jobs:
           echo ${{ runner.os }} >> hash.txt
           powershell -Command "(Get-FileHash -Path main-windows.zip -Algorithm SHA256).Hash | Out-File -Append -Encoding string hash.txt"
         fi
-    
-    - name: List artefacts and build files
-      shell: bash
-      run: 
-        tree artefacts
+
+    - name: Upload hash file
+      uses: actions/upload-artifact@v2
+      with:
+        name: hash-${{ runner.os }}
+        path: artefacts/hash.txt
+
+    - name: Upload compressed binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: binary-${{ runner.os }}
+        path: artefacts/main-${{ runner.os }}.*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create releases directory
+      run: mkdir releases
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: releases
+
+    - name: Combine hash files
+      run: cat releases/hash-* > releases/combined-hash.txt
+
+    - name: List releases
+      run: ls -R releases
