@@ -151,7 +151,7 @@ jobs:
       run: cat temp/hash-*/hash.txt > releases/combined-hash.txt
 
     - name: Move all binary archives into releases
-      run: mv temp/binary-* releases
+      run: mv temp/binary-*/* releases
 
     - name: List releases
       run: ls -R releases
