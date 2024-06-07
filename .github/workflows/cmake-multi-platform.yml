@@ -81,7 +81,7 @@ jobs:
     - name: Make artefacts directory
       shell: bash
       run: |
-        mkdir -p ${{ steps.strings.outputs.build-output-dir }}/artefacts
+        mkdir -p artefacts
 
     - name: List built files
       run: | 
