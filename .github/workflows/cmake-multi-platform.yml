@@ -82,6 +82,13 @@ jobs:
       shell: bash
       run: |
         mkdir -p ${{ steps.strings.outputs.build-output-dir }}/artefacts
+
+    - name: List built files
+      run: | 
+        echo "ls: ${{ steps.strings.outputs.build-output-dir }}"
+        ls ${{ steps.strings.outputs.build-output-dir }}
+        echo "tree: ${{ steps.strings.outputs.build-output-dir }}"
+        tree .
     
     - name: Rename and move binary
       shell: bash
