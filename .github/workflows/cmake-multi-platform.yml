@@ -92,7 +92,7 @@ jobs:
       shell: bash
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/${{ env.EXECUTABLE_NAME }} }} artifacts/${{ env.EXECUTABLE_NAME }} }}-Linux
+          mv ${{ steps.strings.outputs.build-output-dir }}/${{ env.EXECUTABLE_NAME }} artifacts/${{ env.EXECUTABLE_NAME }}-Linux
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           mv "${{ steps.strings.outputs.build-output-dir }}"/Release/${{ env.EXECUTABLE_NAME }}.exe artifacts/${{ env.EXECUTABLE_NAME }}-windows.exe
         fi
@@ -172,4 +172,4 @@ jobs:
         omitBody: True
         tag: ${{ env.TAG_NAME }}
         artifacts: releases/*
-        token: ${{ secrets.GITHUB_TOKEN }
+        token: ${{ secrets.GITHUB_TOKEN }}
