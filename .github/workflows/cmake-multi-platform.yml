@@ -89,7 +89,7 @@ jobs:
       shell: bash
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/main artefacts/main-linux
+          mv ${{ steps.strings.outputs.build-output-dir }}/main artefacts/main-Linux
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
           mv ${{ steps.strings.outputs.build-output-dir }}/main artefacts/main-macos
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
