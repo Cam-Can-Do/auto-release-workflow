@@ -105,7 +105,7 @@ jobs:
       working-directory: artifacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          tar czf main-linux.tar.gz main-linux
+          tar czf main-Linux.tar.gz main-Linux
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
           tar czf main-macos.tar.gz main-macos
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
@@ -118,7 +118,7 @@ jobs:
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           echo ${{ runner.os }} >> hash.txt
-          sha256sum main-linux.tar.gz >> hash.txt
+          sha256sum main-Linux.tar.gz >> hash.txt
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
           echo ${{ runner.os }} >> hash.txt
           shasum -a 256 main-macos.tar.gz >> hash.txt
