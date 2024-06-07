@@ -78,26 +78,53 @@ jobs:
           choco install tree
         fi
 
+    # cd in to build directory since all upcoming steps are run from inside it
+    - run: |
+        cd ${{ steps.strings.outputs.build-output-dir }}
+        mkdir -p artefacts
     
-    - name: Rename binary
+    - name: Rename and move binary
       shell: bash
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/main ${{ steps.strings.outputs.build-output-dir }}/main-linux
+          mv main artefacts/main-linux
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/main ${{ steps.strings.outputs.build-output-dir }}/main-macos
+          mv main artefacts/main-macos
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          mv "${{ steps.strings.outputs.build-output-dir }}\Release\main.exe" "${{ steps.strings.outputs.build-output-dir }}\main-windows.exe"
+          mv Release\main.exe artefacts\main-windows.exe
         fi
 
     - name: List built files
       run: 
-        tree ${{ steps.strings.outputs.build-output-dir }}
+        tree .
 
-    #- name: Test
-    #  working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-    #  run: ctest --build-config ${{ matrix.build_type }}
-  
-  
+    - name: Compress binary
+      shell: bash
+      working-directory: artefacts
+      run: |
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          tar czf main-linux.tar.gz main-linux
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          tar czf main-macos.tar.gz main-macos
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          powershell Compress-Archive -Path main-windows.exe -DestinationPath main-windows.zip
+        fi
+
+    - name: Generate SHA256 hash
+      shell: bash
+      working-directory: artefacts
+      run: |
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          echo ${{ runner.os }} >> hash.txt;
+          sha256sum main-linux.tar.gz >> hash.txt;
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          echo ${{ runner.os }} >> hash.txt;
+          shasum -a 256 main-macos.tar.gz >> hash.txt
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          echo ${{ runner.os }} >> hash.txt;
+          powershell "(Get-FileHash -Path main-windows.zip" -Algorithm SHA256).Hash | Out-File hash.txt -Append
+        fi
+    
+    - name: List artefacts and build files
+      run: 
+        tree .
