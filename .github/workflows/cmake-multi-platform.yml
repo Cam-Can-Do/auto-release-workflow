@@ -136,6 +136,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+
+    - name: Set TAG_NAME
+      run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
     - name: Create temp directory
       run: mkdir temp
 
@@ -148,10 +152,33 @@ jobs:
       run: mkdir releases
 
     - name: Combine hash files
-      run: cat temp/hash-*/hash.txt > releases/combined-hash.txt
+      run: cat temp/hash-*/hash.txt > releases/sha256.txt
 
     - name: Move all binary archives into releases
       run: mv temp/binary-*/* releases
 
     - name: List releases
       run: ls -R releases
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Assets
+      - uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: True
+          omitBody: True
+          tag: ${{ env.TAG_NAME }}
+          artifacts: |
+            releases/*
+          token: ${{ secrets.GITHUB_TOKEN }}
