@@ -84,7 +84,7 @@ jobs:
         mkdir -p artefacts
 
     - name: List built files
-      - run:
+      run:
         tree .
     
     - name: Rename and move binary
