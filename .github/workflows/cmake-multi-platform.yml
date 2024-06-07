@@ -92,9 +92,9 @@ jobs:
       shell: bash
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/${{ env.EXECUTABLE_NAME }} artifacts/${{ env.EXECUTABLE_NAME }}-Linux
+          mv ${{ steps.strings.outputs.build-output-dir }}/${{ env.EXECUTABLE_NAME }} }} artifacts/${{ env.EXECUTABLE_NAME }} }}-Linux
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          mv "${{ steps.strings.outputs.build-output-dir }}"/Release/${{ env.EXECUTABLE_NAME.exe artifacts/${{ env.EXECUTABLE_NAME-windows.exe
+          mv "${{ steps.strings.outputs.build-output-dir }}"/Release/${{ env.EXECUTABLE_NAME }}.exe artifacts/${{ env.EXECUTABLE_NAME }}-windows.exe
         fi
 
     - name: List built files
@@ -106,11 +106,11 @@ jobs:
       working-directory: artifacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          tar czf ${{ env.EXECUTABLE_NAME-Linux.tar.gz ${{ env.EXECUTABLE_NAME-Linux
-          rm ${{ env.EXECUTABLE_NAME-Linux
+          tar czf ${{ env.EXECUTABLE_NAME }}-Linux.tar.gz ${{ env.EXECUTABLE_NAME }}-Linux
+          rm ${{ env.EXECUTABLE_NAME }}-Linux
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          powershell Compress-Archive -Path ${{ env.EXECUTABLE_NAME-windows.exe -DestinationPath ${{ env.EXECUTABLE_NAME-windows.zip
-          rm ${{ env.EXECUTABLE_NAME-windows.exe
+          powershell Compress-Archive -Path ${{ env.EXECUTABLE_NAME }}-windows.exe -DestinationPath ${{ env.EXECUTABLE_NAME }}-windows.zip
+          rm ${{ env.EXECUTABLE_NAME }}-windows.exe
         fi
 
     - name: Generate SHA256 hash
@@ -118,9 +118,9 @@ jobs:
       working-directory: artifacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          sha256sum ${{ env.EXECUTABLE_NAME-Linux.tar.gz >> hash.txt
+          sha256sum ${{ env.EXECUTABLE_NAME }}-Linux.tar.gz >> hash.txt
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          sha256sum ${{ env.EXECUTABLE_NAME-windows.zip >> hash.txt
+          sha256sum ${{ env.EXECUTABLE_NAME }}-windows.zip >> hash.txt
         fi
 
     - name: Upload hash file
@@ -133,7 +133,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: binary-${{ runner.os }}
-        path: artifacts/${{ env.EXECUTABLE_NAME-${{ runner.os }}*
+        path: artifacts/${{ env.EXECUTABLE_NAME }}-${{ runner.os }}*
 
   release:
     needs: build
