@@ -78,17 +78,10 @@ jobs:
           choco install tree
         fi
 
-    # cd in to build directory since all upcoming steps are run from inside it
-    - run: |
-        cd ${{ steps.strings.outputs.build-output-dir }}
-        mkdir -p artefacts
-
-    - name: List built files
-      run:
-        tree .
     
     - name: Rename and move binary
       shell: bash
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           mv main artefacts/main-linux
@@ -104,7 +97,7 @@ jobs:
 
     - name: Compress binary
       shell: bash
-      working-directory: artefacts
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}/artefacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           tar czf main-linux.tar.gz main-linux
@@ -116,7 +109,7 @@ jobs:
 
     - name: Generate SHA256 hash
       shell: bash
-      working-directory: artefacts
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}/artefacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           echo ${{ runner.os }} >> hash.txt;
@@ -130,5 +123,6 @@ jobs:
         fi
     
     - name: List artefacts and build files
+      shell: bash
       run: 
-        tree .
+        tree ${{ steps.strings.outputs.build-output-dir }}/artefacts
