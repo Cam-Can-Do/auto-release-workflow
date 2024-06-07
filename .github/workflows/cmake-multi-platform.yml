@@ -116,14 +116,14 @@ jobs:
       working-directory: ${{ steps.strings.outputs.build-output-dir }}/artefacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          echo ${{ runner.os }} >> hash.txt;
-          sha256sum main-linux.tar.gz >> hash.txt;
+          echo ${{ runner.os }} >> hash.txt
+          sha256sum main-linux.tar.gz >> hash.txt
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          echo ${{ runner.os }} >> hash.txt;
+          echo ${{ runner.os }} >> hash.txt
           shasum -a 256 main-macos.tar.gz >> hash.txt
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          echo ${{ runner.os }} >> hash.txt;
-          powershell "(Get-FileHash -Path main-windows.zip" -Algorithm SHA256).Hash | Out-File hash.txt -Append
+          echo ${{ runner.os }} >> hash.txt
+          powershell "(Get-FileHash -Path main-windows.zip -Algorithm SHA256).Hash" | Out-File -Append hash.txt
         fi
     
     - name: List artefacts and build files
