@@ -73,10 +73,10 @@ jobs:
           choco install tree
         fi
 
-    - name: Make artefacts directory
+    - name: Make artifacts directory
       shell: bash
       run: |
-        mkdir -p artefacts
+        mkdir -p artifacts
 
     - name: List built files
       run: | 
@@ -89,11 +89,11 @@ jobs:
       shell: bash
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/main artefacts/main-Linux
+          mv ${{ steps.strings.outputs.build-output-dir }}/main artifacts/main-Linux
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/main artefacts/main-macos
+          mv ${{ steps.strings.outputs.build-output-dir }}/main artifacts/main-macos
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          mv "${{ steps.strings.outputs.build-output-dir }}"/Release/main.exe artefacts/main-windows.exe
+          mv "${{ steps.strings.outputs.build-output-dir }}"/Release/main.exe artifacts/main-windows.exe
         fi
 
     - name: List built files
@@ -102,7 +102,7 @@ jobs:
 
     - name: Compress binary
       shell: bash
-      working-directory: artefacts
+      working-directory: artifacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           tar czf main-linux.tar.gz main-linux
@@ -114,7 +114,7 @@ jobs:
 
     - name: Generate SHA256 hash
       shell: bash
-      working-directory: artefacts
+      working-directory: artifacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           echo ${{ runner.os }} >> hash.txt
@@ -131,13 +131,13 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: hash-${{ runner.os }}
-        path: artefacts/hash.txt
+        path: artifacts/hash.txt
 
     - name: Upload compressed binary
       uses: actions/upload-artifact@v2
       with:
         name: binary-${{ runner.os }}
-        path: artefacts/main-${{ runner.os }}*
+        path: artifacts/main-${{ runner.os }}*
 
   release:
     needs: build
