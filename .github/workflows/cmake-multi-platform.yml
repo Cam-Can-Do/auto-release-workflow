@@ -67,8 +67,6 @@ jobs:
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           sudo apt-get install -y tree
-        elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          brew install tree
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           choco install tree
         fi
@@ -90,8 +88,6 @@ jobs:
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           mv ${{ steps.strings.outputs.build-output-dir }}/main artifacts/main-Linux
-        elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/main artifacts/main-macos
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           mv "${{ steps.strings.outputs.build-output-dir }}"/Release/main.exe artifacts/main-windows.exe
         fi
@@ -100,16 +96,16 @@ jobs:
       run: 
         tree .
 
-    - name: Compress binary
+    - name: Compress binary and remove original executable
       shell: bash
       working-directory: artifacts
       run: |
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           tar czf main-Linux.tar.gz main-Linux
-        elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          tar czf main-macos.tar.gz main-macos
+          rm main-Linux
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           powershell Compress-Archive -Path main-windows.exe -DestinationPath main-windows.zip
+          rm main-windows.exe
         fi
 
     - name: Generate SHA256 hash
@@ -119,9 +115,6 @@ jobs:
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           echo ${{ runner.os }} >> hash.txt
           sha256sum main-Linux.tar.gz >> hash.txt
-        elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          echo ${{ runner.os }} >> hash.txt
-          shasum -a 256 main-macos.tar.gz >> hash.txt
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
           echo ${{ runner.os }} >> hash.txt
           powershell -Command "(Get-FileHash -Path main-windows.zip -Algorithm SHA256).Hash | Out-File -Append -Encoding string hash.txt"
@@ -143,16 +136,22 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Create releases directory
-      run: mkdir releases
+    - name: Create temp directory
+      run: mkdir temp
 
     - name: Download all artifacts
       uses: actions/download-artifact@v2
       with:
-        path: releases
+        path: temp
+      
+    - name: Create releases directory
+      run: mkdir releases
 
     - name: Combine hash files
-      run: cat releases/hash-*/hash.txt > releases/combined-hash.txt
+      run: cat temp/hash-*/hash.txt > releases/combined-hash.txt
+
+    - name: Move all binary archives into releases
+      run: mv temp/binary-* releases
 
     - name: List releases
       run: ls -R releases
