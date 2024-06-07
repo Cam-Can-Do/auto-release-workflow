@@ -98,7 +98,7 @@ jobs:
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
           mv ${{ steps.strings.outputs.build-output-dir }}/main artefacts/main-macos
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          mv ${{ steps.strings.outputs.build-output-dir }}/Release/main.exe artefacts/main-windows.exe
+          mv "${{ steps.strings.outputs.build-output-dir }}"/Release/main.exe artefacts/main-windows.exe
         fi
 
     - name: List built files
