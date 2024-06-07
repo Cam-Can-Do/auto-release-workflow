@@ -1,1 +1,1 @@
-add_executable(main src/main.cpp)
+add_executable(new_executable_name src/main.cpp)
