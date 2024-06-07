@@ -157,7 +157,7 @@ jobs:
         path: releases
 
     - name: Combine hash files
-      run: cat releases/hash-* > releases/combined-hash.txt
+      run: cat releases/hash-*/hash.txt > releases/combined-hash.txt
 
     - name: List releases
       run: ls -R releases
