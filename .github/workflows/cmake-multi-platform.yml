@@ -78,6 +78,10 @@ jobs:
           choco install tree
         fi
 
+    - name: Make artefacts directory
+      shell: bash
+      run: |
+        mkdir -p ${{ steps.strings.outputs.build-output-dir }}/artefacts
     
     - name: Rename and move binary
       shell: bash
